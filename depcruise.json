@@ -1,0 +1,1305 @@
+{
+  "modules": [
+    {
+      "source": "src/App.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~components/Pages/About/About",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Pages/About/About.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "~components/Pages/Home/Home",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Pages/Home/Home.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-router-dom",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react-router-dom@6.30.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-router-dom/dist/main.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/main.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/App.tsx",
+        "src/components/Pages/About/About.tsx",
+        "src/components/Pages/Home/Home.tsx",
+        "src/components/Molecules/Card/Card.tsx",
+        "src/components/Atoms/Button/Button.tsx",
+        "src/components/Atoms/Typograph/Typograph.tsx",
+        "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+        "src/components/Organisms/Header/Header.tsx",
+        "src/main.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/.pnpm/react-router-dom@6.30.1_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/react-router-dom/dist/main.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Pages/About/About.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Pages/Home/Home.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~components/Molecules/Card/Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Molecules/Card/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/App.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Molecules/Card/Card.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~components/Atoms",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Atoms/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": false,
+          "rules": [
+            {
+              "severity": "warn",
+              "name": "no-layer-barrel-imports"
+            }
+          ]
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Pages/Home/Home.tsx",
+        "src/components/Molecules/Card/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Atoms/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Atoms/Button/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Typograph",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Atoms/Typograph/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Molecules/Card/Card.tsx",
+        "src/components/Molecules/MoleculesBox/MoleculesBox.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Atoms/Button/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Atoms/Button/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Atoms/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Atoms/Button/Button.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Atoms/Button/index.ts",
+        "src/components/Organisms/Header/Header.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Atoms/Typograph/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Typograph",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Atoms/Typograph/Typograph.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Atoms/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Atoms/Typograph/Typograph.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~/components/Molecules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Molecules/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": false,
+          "rules": [
+            {
+              "severity": "error",
+              "name": "no-up-from-atoms"
+            },
+            {
+              "severity": "warn",
+              "name": "no-layer-barrel-imports"
+            }
+          ]
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Atoms/Typograph/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Molecules/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Molecules/Card/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MoleculesBox",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Molecules/MoleculesBox/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Molecules/MoleculesBox/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Atoms/Typograph/Typograph.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Molecules/Card/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Molecules/Card/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Molecules/Card/Card.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/Card/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Molecules/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Molecules/MoleculesBox/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./MoleculesBox",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/MoleculesBox/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Molecules/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~components/Atoms",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Atoms/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": true,
+          "cycle": [
+            {
+              "name": "src/components/Atoms/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Atoms/Typograph/Typograph.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/index.ts",
+              "dependencyTypes": [
+                "aliased",
+                "aliased-tsconfig",
+                "aliased-tsconfig-paths",
+                "local",
+                "import"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/MoleculesBox/index.ts",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            },
+            {
+              "name": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+              "dependencyTypes": [
+                "local",
+                "export"
+              ]
+            }
+          ],
+          "valid": false,
+          "rules": [
+            {
+              "severity": "warn",
+              "name": "no-layer-barrel-imports"
+            }
+          ]
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "src/components/Molecules/MoleculesBox/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/components/Organisms/Header/Header.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "~components/Atoms/Button/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "aliased",
+            "aliased-tsconfig",
+            "aliased-tsconfig-paths",
+            "local",
+            "import"
+          ],
+          "resolved": "src/components/Atoms/Button/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "src/main.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./App",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "src/App.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react@18.3.1/node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-dom/client",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/react-dom@18.3.1_react@18.3.1/node_modules/react-dom/client.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/.pnpm/react-dom@18.3.1_react@18.3.1/node_modules/react-dom/client.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "src/main.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    }
+  ],
+  "summary": {
+    "violations": [
+      {
+        "type": "dependency",
+        "from": "src/components/Atoms/Typograph/Typograph.tsx",
+        "to": "src/components/Molecules/index.ts",
+        "rule": {
+          "severity": "error",
+          "name": "no-up-from-atoms"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/components/Atoms/Typograph/Typograph.tsx",
+        "to": "src/components/Molecules/index.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-layer-barrel-imports"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/components/Molecules/Card/Card.tsx",
+        "to": "src/components/Atoms/index.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-layer-barrel-imports"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/components/Molecules/MoleculesBox/MoleculesBox.tsx",
+        "to": "src/components/Atoms/index.ts",
+        "rule": {
+          "severity": "warn",
+          "name": "no-layer-barrel-imports"
+        }
+      }
+    ],
+    "error": 1,
+    "warn": 3,
+    "info": 0,
+    "ignore": 0,
+    "totalCruised": 18,
+    "totalDependenciesCruised": 27,
+    "optionsUsed": {
+      "baseDir": "/Users/cazma/Downloads/atomic-react-router-depcruise",
+      "combinedDependencies": false,
+      "detectJSDocImports": false,
+      "doNotFollow": {
+        "path": "node_modules"
+      },
+      "enhancedResolveOptions": {
+        "extensions": [
+          ".ts",
+          ".tsx",
+          ".js",
+          ".jsx",
+          ".json"
+        ]
+      },
+      "exoticRequireStrings": [],
+      "externalModuleResolutionStrategy": "node_modules",
+      "metrics": false,
+      "moduleSystems": [
+        "es6",
+        "cjs",
+        "tsd",
+        "amd"
+      ],
+      "outputTo": "-",
+      "outputType": "json",
+      "preserveSymlinks": false,
+      "rulesFile": ".dependency-cruiser.cjs",
+      "skipAnalysisNotInRules": false,
+      "tsConfig": {
+        "fileName": "./tsconfig.json"
+      },
+      "tsPreCompilationDeps": true,
+      "args": "src"
+    },
+    "ruleSetUsed": {
+      "forbidden": [
+        {
+          "name": "no-up-from-atoms",
+          "severity": "error",
+          "from": {
+            "path": "^src/components/Atoms"
+          },
+          "to": {
+            "path": "^src/components/(Molecules|Organisms|Templates|Pages)"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-up-from-molecules",
+          "severity": "error",
+          "from": {
+            "path": "^src/components/Molecules"
+          },
+          "to": {
+            "path": "^src/components/(Organisms|Templates|Pages)"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-up-from-organisms",
+          "severity": "error",
+          "from": {
+            "path": "^src/components/Organisms"
+          },
+          "to": {
+            "path": "^src/components/(Templates|Pages)"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-up-from-templates",
+          "severity": "error",
+          "from": {
+            "path": "^src/components/Templates"
+          },
+          "to": {
+            "path": "^src/components/Pages"
+          },
+          "scope": "module"
+        },
+        {
+          "name": "no-layer-barrel-imports",
+          "severity": "warn",
+          "from": {
+            "path": "^src"
+          },
+          "to": {
+            "path": "^src/components/(Atoms|Molecules|Organisms|Templates|Pages)/index.(ts|tsx)$"
+          },
+          "scope": "module"
+        }
+      ]
+    }
+  }
+}

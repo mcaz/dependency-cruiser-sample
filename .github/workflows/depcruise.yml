@@ -1,0 +1,23 @@
+name: depcruise
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  depcruise:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install
+        run: npm ci || npm i
+      - name: Run dependency-cruiser
+        run: npm run depcruise
+      - name: Annotate violations (Files changed)
+        run: npm run depcruise:annotate
+      - name: Upload depcruise.json
+        uses: actions/upload-artifact@v4
+        with:
+          name: depcruise-report
+          path: depcruise.json

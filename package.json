@@ -1,0 +1,29 @@
+{
+  "name": "atomic-react-router-depcruise",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "depcruise": "depcruise --config .dependency-cruiser.cjs --ts-config ./tsconfig.json --output-type json src > depcruise.json",
+    "depcruise:text": "depcruise --config .dependency-cruiser.cjs --ts-config ./tsconfig.json --output-type text src",
+    "depcruise:annotate": "node ./scripts/depcruise-annotate.cjs",
+    "depcruise:ci": "npm run depcruise && npm run depcruise:annotate"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "dependency-cruiser": "^16.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2"
+  }
+}
