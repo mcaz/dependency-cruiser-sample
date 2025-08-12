@@ -11,10 +11,9 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          version: 9
-          run_install: false
+          node-version: '20'
+          cache: 'pnpm'
 
-      # ★ pnpm を Corepack で有効化（ここが必須）
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
@@ -24,14 +23,6 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile || pnpm install
 
-      - name: Run dependency-cruiser
-        run: pnpm run depcruise
-
-      - name: Annotate violations (Files changed)
-        run: pnpm run depcruise:annotate
-
-      - name: Upload depcruise.json
-        uses: actions/upload-artifact@v4
-        with:
-          name: depcruise-report
-          path: depcruise.json
+      # 依存解析 → 注釈出力を一括実行
+      - name: Run depcruise & annotate
+        run: pnpm run depcruise:ci
