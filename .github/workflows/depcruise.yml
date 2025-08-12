@@ -14,6 +14,7 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      # ★ ここでpnpmを有効化（これが無いとpnpm not found）
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
