@@ -2,20 +2,40 @@ name: depcruise
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   depcruise:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      # Node をセットアップ（pnpm キャッシュも有効化）
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: Install
-        run: npm install
+          cache: 'pnpm'
+
+      # pnpm をセットアップ
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      # 依存インストール
+      # ※ lockfile（pnpm-lock.yaml）をコミットしているなら --frozen-lockfile を推奨
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+        # lockfile未コミットの場合は↓に変更:
+        # run: pnpm install
+
+      # 依存解析（JSON出力）
       - name: Run dependency-cruiser
-        run: npm run depcruise
+        run: pnpm run depcruise
+
+      # 注釈出力（Files changed にピン表示）
       - name: Annotate violations (Files changed)
-        run: npm run depcruise:annotate
+        run: pnpm run depcruise:annotate
+
+      # 成果物アップロード（任意）
       - name: Upload depcruise.json
         uses: actions/upload-artifact@v4
         with:
