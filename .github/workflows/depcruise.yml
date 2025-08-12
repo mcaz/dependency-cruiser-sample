@@ -15,10 +15,16 @@ jobs:
           cache: 'pnpm'              # pnpm-lock.yaml があると効く
 
       # ← ここで pnpm を必ず入れる（この前に pnpm を使わないこと）
-      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          version: 9
-          run_install: false
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
 
       - name: Check pnpm
         run: |
