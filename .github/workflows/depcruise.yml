@@ -11,7 +11,7 @@ jobs:
         with:
           node-version: '20'
       - name: Install
-        run: npm ci || npm i
+        run: npm install
       - name: Run dependency-cruiser
         run: npm run depcruise
       - name: Annotate violations (Files changed)
