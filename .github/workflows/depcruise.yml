@@ -12,13 +12,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'        # pnpm-lock.yaml があると効く
+          cache: 'pnpm'              # pnpm-lock.yaml があると効く
 
-      # ★ これが必須：pnpm をインストール＆PATHに通す
+      # ← ここで pnpm を必ず入れる（この前に pnpm を使わないこと）
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-          run_install: false   # ここではインストールしない（次のステップで実行）
+          run_install: false
+
+      - name: Check pnpm
+        run: |
+          pnpm --version
+          which pnpm
+          echo "$PATH"
 
       - name: Install deps
         run: pnpm install --frozen-lockfile || pnpm install
