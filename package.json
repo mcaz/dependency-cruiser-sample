@@ -10,7 +10,7 @@
     "depcruise": "depcruise --config .dependency-cruiser.cjs --ts-config ./tsconfig.json --output-type json src > depcruise.json",
     "depcruise:text": "depcruise --config .dependency-cruiser.cjs --ts-config ./tsconfig.json --output-type text src",
     "depcruise:annotate": "node ./scripts/depcruise-annotate.cjs",
-    "depcruise:ci": "npm run depcruise || true && npm run depcruise:annotate"
+    "depcruise:ci": "pnpm run depcruise || true && pnpm run depcruise:annotate"
   },
   "dependencies": {
     "react": "^18.3.1",
