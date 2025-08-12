@@ -9,24 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # ① 先に pnpm を入れる（ここで PATH に通る）
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      # ② その後で node をセットしつつ pnpm キャッシュを有効化
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'              # pnpm-lock.yaml があると効く
-
-      # ← ここで pnpm を必ず入れる（この前に pnpm を使わないこと）
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - run: npm i -g pnpm@9
-      - run: pnpm --version
-      
-      - name: Check pnpm
-        run: |
-          pnpm --version
-          which pnpm
-          echo "$PATH"
+          cache: 'pnpm'   # ← ここで pnpm が実在するので失敗しない
 
       - name: Install deps
         run: pnpm install --frozen-lockfile || pnpm install
