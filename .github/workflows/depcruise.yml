@@ -12,20 +12,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'   # lockfile があればキャッシュされます
+          # lockfile があるなら pnpm キャッシュ有効化してOK（なくても動作に影響なし）
+          cache: 'pnpm'
 
-      # ← これが肝。Corepackでpnpmを有効化
+      # ★ pnpm を Corepack で有効化（ここが必須）
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
           corepack prepare pnpm@9 --activate
           pnpm --version
 
-      # lockfileがあるなら --frozen-lockfile 推奨
       - name: Install deps
-        run: pnpm install --frozen-lockfile
-        # lockfile未コミットなら:
-        # run: pnpm install
+        run: pnpm install --frozen-lockfile || pnpm install
 
       - name: Run dependency-cruiser
         run: pnpm run depcruise
