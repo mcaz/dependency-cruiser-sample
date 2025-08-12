@@ -12,14 +12,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'pnpm'        # pnpm-lock.yaml があると効く
 
-      # ★ ここでpnpmを有効化（pnpmが使える状態にする）
-      - name: Enable pnpm via Corepack
-        run: |
-          corepack enable
-          corepack prepare pnpm@9 --activate
-          pnpm --version   # バージョン確認で有効化を検証
+      # ★ これが必須：pnpm をインストール＆PATHに通す
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false   # ここではインストールしない（次のステップで実行）
 
       - name: Install deps
         run: pnpm install --frozen-lockfile || pnpm install
