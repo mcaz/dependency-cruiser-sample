@@ -14,16 +14,15 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
-      # ★ ここでpnpmを有効化（これが無いとpnpm not found）
+      # ★ ここでpnpmを有効化（pnpmが使える状態にする）
       - name: Enable pnpm via Corepack
         run: |
           corepack enable
           corepack prepare pnpm@9 --activate
-          pnpm --version
+          pnpm --version   # バージョン確認で有効化を検証
 
       - name: Install deps
         run: pnpm install --frozen-lockfile || pnpm install
 
-      # 依存解析 → 注釈出力を一括実行
       - name: Run depcruise & annotate
         run: pnpm run depcruise:ci
