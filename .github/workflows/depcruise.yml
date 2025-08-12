@@ -9,33 +9,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Node をセットアップ（pnpm キャッシュも有効化）
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'pnpm'
+          cache: 'pnpm'   # lockfile があればキャッシュされます
 
-      # pnpm をセットアップ
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 9
+      # ← これが肝。Corepackでpnpmを有効化
+      - name: Enable pnpm via Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@9 --activate
+          pnpm --version
 
-      # 依存インストール
-      # ※ lockfile（pnpm-lock.yaml）をコミットしているなら --frozen-lockfile を推奨
+      # lockfileがあるなら --frozen-lockfile 推奨
       - name: Install deps
         run: pnpm install --frozen-lockfile
-        # lockfile未コミットの場合は↓に変更:
+        # lockfile未コミットなら:
         # run: pnpm install
 
-      # 依存解析（JSON出力）
       - name: Run dependency-cruiser
         run: pnpm run depcruise
 
-      # 注釈出力（Files changed にピン表示）
       - name: Annotate violations (Files changed)
         run: pnpm run depcruise:annotate
 
-      # 成果物アップロード（任意）
       - name: Upload depcruise.json
         uses: actions/upload-artifact@v4
         with:
