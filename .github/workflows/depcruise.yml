@@ -1,23 +1,23 @@
-name: depcruise
+name: depcruise test
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
-  depcruise:
+  depcruise-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - name: Install
-        run: npm ci || npm i
-      - name: Run dependency-cruiser
-        run: npm run depcruise
-      - name: Annotate violations (Files changed)
-        run: npm run depcruise:annotate
-      - name: Upload depcruise.json
-        uses: actions/upload-artifact@v4
-        with:
-          name: depcruise-report
-          path: depcruise.json
+          node-version: 20
+
+      - name: Run fixed comment script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./scripts/depcruise-annotate.cjs
