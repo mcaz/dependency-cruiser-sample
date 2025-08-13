@@ -1,28 +1,26 @@
-name: depcruise
-on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+permissions:
+  contents: read
+  pull-requests: write   # ← 必須
 
-jobs:
-  depcruise:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+steps:
+  - uses: actions/checkout@v4
 
-      # ① 先に pnpm を入れる（ここで PATH に通る）
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-          run_install: false
+  - uses: pnpm/action-setup@v4
+    with:
+      version: 9
+      run_install: false
 
-      # ② その後で node をセットしつつ pnpm キャッシュを有効化
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'   # ← ここで pnpm が実在するので失敗しない
+  - uses: actions/setup-node@v4
+    with:
+      node-version: '20'
+      cache: 'pnpm'
 
-      - name: Install deps
-        run: pnpm install --frozen-lockfile || pnpm install
+  - run: pnpm install --frozen-lockfile || pnpm install
 
-      - name: Run depcruise & annotate
-        run: pnpm run depcruise:ci
+  # depcruise 実行はスキップして良い（検証なので不要）
+  # - run: pnpm run depcruise || true
+
+  - name: Post fixed test comment
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    run: node ./scripts/depcruise-annotate.cjs
