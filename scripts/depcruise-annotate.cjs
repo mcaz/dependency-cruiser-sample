@@ -115,9 +115,7 @@ async function main() {
       path: target.filename, // 現在の差分上のパス
       side: 'RIGHT',
       line: firstAddedLine,
-      body:
-        '**[TEST] dependency-cruiser warning (fixed message)**\n' +
-        `差分の最初の追加行(${firstAddedLine})に固定コメントを投稿しました。`,
+      body: `⚠️ dependency-cruiser violation: ${v.rule?.name || ''}\n${v.comment || ''}`
     }),
   });
 
