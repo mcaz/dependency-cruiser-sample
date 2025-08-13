@@ -1,141 +1,28 @@
-# .github/workflows/depcruise.yml の jobs.depcruise に追加・修正
+name: depcruise
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
-permissions:
-  contents: read
-  pull-requests: write    # ← これが無いとレビューコメントが作れません
+jobs:
+  depcruise:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-steps:
-  - uses: actions/checkout@v4
+      # ① 先に pnpm を入れる（ここで PATH に通る）
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
-  # ① pnpm を先に入れて PATH を通す（PRに既にあり）
-  - uses: pnpm/action-setup@v4
-    with:
-      version: 9
-      run_install: false
+      # ② その後で node をセットしつつ pnpm キャッシュを有効化
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'   # ← ここで pnpm が実在するので失敗しない
 
-  # ② Node セットアップ + pnpm キャッシュ（PRに既にあり）
-  - uses: actions/setup-node@v4
-    with:
-      node-version: '20'
-      cache: 'pnpm'
+      - name: Install deps
+        run: pnpm install --frozen-lockfile || pnpm install
 
-  # ③ 依存インストール（PRに既にあり）
-  - name: Install deps
-    run: pnpm install --frozen-lockfile || pnpm install
-
-  # ④ 解析 & JSON 生成（PRに既にあり）
-  - name: Run depcruise & annotate (JSON only)
-    run: pnpm run depcruise || true
-
-  # ⑤ テキスト出力で中身確認（デバッグ用・任意）
-  - name: Sanity check (text output)
-    run: pnpm run depcruise:text || true
-
-  # ⑥ JSON を使ってレビューコメントを作成（新規）
-  - name: Annotate violations as PR review comments
-    uses: actions/github-script@v7
-    with:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
-      script: |
-        const fs = require('fs');
-        const path = require('path');
-
-        // 解析結果を読む
-        const reportPath = path.join(process.cwd(), 'depcruise.json');
-        if (!fs.existsSync(reportPath)) {
-          core.warning('depcruise.json not found; skip annotations');
-          return;
-        }
-        const data = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-
-        // PR コンテキスト
-        const { owner, repo } = context.repo;
-        const pull_number = context.payload.pull_request?.number;
-        if (!pull_number) {
-          core.warning('Not a pull_request event; skip annotations');
-          return;
-        }
-
-        // 違反を抽出（dependency-cruiser の JSON 仕様に合わせて from/to + rule + severity を組み立て）
-        // data?.summary?.violations や data?.violations のどちらかに入るパターンがあるため柔軟に取る
-        const violations = (data.violations || data.summary?.violations || []).filter(v => {
-          // 警告も対象にしたい場合は severities を調整
-          return ['error', 'warn', 'warning'].includes(String(v.severity).toLowerCase());
-        });
-
-        if (!violations.length) {
-          console.log('No violations found');
-          return;
-        }
-
-        // 差分ファイル一覧を取得して、コメント可能な path に限定
-        const files = await github.rest.pulls.listFiles({ owner, repo, pull_number, per_page: 300 });
-        const changedPaths = new Set(files.data.map(f => f.filename));
-
-        // 1 PR レビューでまとめて複数コメントを投稿する（Files changed に並ぶ）
-        const comments = [];
-
-        for (const v of violations) {
-          // dependency-cruiser の JSON 例:
-          // v.from, v.to, v.rule.name, v.severity, v.cycle, v.comment など
-          const filePath = v.from?.resolved || v.from?.source || v.from; // 柔軟に取得
-          if (!filePath) continue;
-
-          // ルート相対に正規化（リポジトリ直下に対する相対パスを期待）
-          // 例: "src/..." で始まる形に整える。ズレる場合は .dependency-cruiser.cjs 側で "prefix" を調整。
-          let relative = filePath.replace(/^(\.\/|\/)/, '');
-          // tsconfig のパスエイリアス（~components/...）などは depcruiser が解決済みのはず（PR では --ts-config を指定）:contentReference[oaicite:2]{index=2}
-          // もし still マッチしない場合は、ここにマッピングを足す
-
-          if (!changedPaths.has(relative)) {
-            // to 側のファイルに紐づけたいケース
-            const toPath = v.to?.resolved || v.to?.source || v.to;
-            if (toPath) {
-              const relTo = String(toPath).replace(/^(\.\/|\/)/, '');
-              if (changedPaths.has(relTo)) {
-                relative = relTo;
-              }
-            }
-          }
-
-          if (!changedPaths.has(relative)) {
-            // 変更されていないファイルには inline コメントできないのでスキップ
-            continue;
-          }
-
-          // 行番号の特定: まずは diff の先頭（1行目）に落とすフォールバック
-          // 余力があれば import 文の位置を grep して特定する実装に差し替える
-          const body = [
-            `dependency-cruiser violation (${v.severity})`,
-            v.rule ? `rule: \`${v.rule.name}\`` : null,
-            v.comment ? `comment: ${v.comment}` : null,
-            v.from && v.to ? `from: \`${v.from.source || v.from}\` -> to: \`${v.to.source || v.to}\`` : null,
-          ].filter(Boolean).join('\n');
-
-          comments.push({
-            path: relative,
-            side: 'RIGHT',
-            line: 1,        // ← フォールバック（確実に表示させる）
-            body,
-          });
-
-          if (comments.length >= 50) break; // スパム防止の上限
-        }
-
-        if (!comments.length) {
-          console.log('No commentable violations (changed files mismatch).');
-          return;
-        }
-
-        await github.rest.pulls.createReview({
-          owner, repo, pull_number,
-          event: 'COMMENT',
-          comments
-        });
-
-  # ⑦（任意）JSON を保存
-  - name: Upload depcruise.json
-    uses: actions/upload-artifact@v4
-    with:
-      name: depcruise-report
-      path: depcruise.json
+      - name: Run depcruise & annotate
+        run: pnpm run depcruise:ci
