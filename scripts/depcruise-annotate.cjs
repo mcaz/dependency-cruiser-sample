@@ -1,132 +1,103 @@
 // scripts/depcruise-annotate.cjs
+// 目的: このPRの "src/components/Molecules/MoleculesBox/MoleculesBox.tsx" に
+//       固定文言のレビューコメントを 1 件だけ投稿する（Files changed に出ることを確認）
+// 依存: なし（Node の fetch を使用）。ワークフロー側で pull-requests: write 権限が必要。
+
 const fs = require('fs');
-const path = require('path');
 
 async function gh(pathname, init = {}) {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
-  const h = init.headers || {};
-  return fetch(`https://api.github.com${pathname}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'X-GitHub-Api-Version': '2022-11-28',
-      ...h,
-    },
-  });
+  const token =
+    process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
+  if (!token) {
+    console.error('GITHUB_TOKEN が見つかりません（permissions: pull-requests: write が必要）');
+    return { ok: false, status: 0, text: async () => 'no token' };
+  }
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'X-GitHub-Api-Version': '2022-11-28',
+    ...(init.headers || {}),
+  };
+  return fetch(`https://api.github.com${pathname}`, { ...init, headers });
 }
 
-const toRel = (p) => String(p || '').replace(/^(\.\/|\/)/, '');
-
 async function main() {
-  const repoFull = process.env.GITHUB_REPOSITORY;
+  // リポジトリとPR番号
+  const repoFull = process.env.GITHUB_REPOSITORY; // e.g. "owner/repo"
+  if (!repoFull) {
+    console.error('GITHUB_REPOSITORY が見つかりません');
+    return;
+  }
   const [owner, repo] = repoFull.split('/');
-  const ev = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-  const pull_number = ev.pull_request?.number;
-  const ROOT_PREFIX = process.env.ROOT_PREFIX || ''; // 例: apps/supporter-web/
 
-  // 変更ファイル一覧
-  const filesRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/files?per_page=300`);
-  const files = await filesRes.json();
-  const changed = new Set();
-  for (const f of files) {
-    if (f.filename) changed.add(f.filename);
-    if (f.previous_filename) changed.add(f.previous_filename);
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  if (!eventPath || !fs.existsSync(eventPath)) {
+    console.error('GITHUB_EVENT_PATH が見つかりません');
+    return;
+  }
+  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  const pull_number = event.pull_request?.number;
+  if (!pull_number) {
+    console.error('pull_request.number が見つかりません（PR以外のイベント）');
+    return;
   }
 
-  // ① 固定コメント（検証用・一度だけ）
-  if (files[0]?.filename) {
-    await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
+  // 差分ファイル一覧を取得
+  const filesRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/files?per_page=300`);
+  if (!filesRes.ok) {
+    console.error('listFiles 取得に失敗:', filesRes.status, await filesRes.text());
+    return;
+  }
+  const files = await filesRes.json();
+
+  // 目標ファイル（固定）
+  const TARGET_PATH = 'src/components/Molecules/MoleculesBox/MoleculesBox.tsx';
+
+  // 差分に存在するか確認（リネーム対応で previous_filename も見る）
+  const targetInDiff = files.find(
+    (f) => f.filename === TARGET_PATH || f.previous_filename === TARGET_PATH
+  );
+
+  if (targetInDiff) {
+    // Files changed の MoleculesBox.tsx（現パス）に 1 行目で固定コメント
+    const reviewRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
       method: 'POST',
       body: JSON.stringify({
         event: 'COMMENT',
         comments: [
           {
-            path: files[0].filename,
+            path: targetInDiff.filename, // 現在の差分上のパスに合わせる
             side: 'RIGHT',
-            line: 1,
+            line: 1, // まずは 1 行目固定（行番号解決は後で拡張可能）
             body:
               '**[TEST] dependency-cruiser warning (fixed message)**\n' +
-              'このコメントは固定文言です。次に depcruise.json 由来の本番コメントを試投します。',
+              'MoleculesBox.tsx に対する決め打ち警告（動作検証用）。',
           },
         ],
       }),
     });
-  }
 
-  // ② depcruise.json から本番コメント
-  const reportPath = path.join(process.cwd(), 'depcruise.json');
-  if (!fs.existsSync(reportPath)) {
-    console.log('no depcruise.json – skip real annotations');
-    return;
-  }
-  const data = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-  const violations = (data.violations || data.summary?.violations || []).filter((v) =>
-    ['error', 'warn', 'warning'].includes(String(v.severity).toLowerCase())
-  );
-
-  const comments = [];
-  for (const v of violations) {
-    // from / to の候補を両方見る
-    const cands = [v.from?.resolved, v.from?.source, v.from, v.to?.resolved, v.to?.source, v.to]
-      .map(toRel)
-      .filter(Boolean);
-
-    let target = null;
-    for (const c of cands) {
-      const withPrefix = path.posix.join(ROOT_PREFIX, c); // apps/supporter-web/src/... に合わせる
-      if (changed.has(withPrefix)) {
-        target = withPrefix;
-        break;
-      }
-      if (changed.has(c)) {
-        target = c;
-        break;
-      }
+    if (!reviewRes.ok) {
+      console.error('createReview 失敗:', reviewRes.status, await reviewRes.text());
+    } else {
+      console.log('OK: Files changed の MoleculesBox.tsx に固定コメントを投稿しました。');
     }
-    if (!target) continue; // 差分外 → 後で全体コメント
-
-    const body = [
-      `dependency-cruiser violation (${v.severity})`,
-      v.rule?.name ? `rule: \`${v.rule.name}\`` : null,
-      v.comment ? `comment: ${v.comment}` : null,
-      v.from && v.to
-        ? `from: \`${toRel(v.from?.source || v.from)}\` -> to: \`${toRel(v.to?.source || v.to)}\``
-        : null,
-    ]
-      .filter(Boolean)
-      .join('\n');
-
-    comments.push({ path: target, side: 'RIGHT', line: 1, body });
-    if (comments.length >= 50) break; // スパム防止
-  }
-
-  if (comments.length) {
-    await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
-      method: 'POST',
-      body: JSON.stringify({ event: 'COMMENT', comments }),
-    });
-  }
-
-  // ③ 差分に紐づけられなかった違反があるなら、PR全体コメントで要約（ゼロ表示防止）
-  const unmapped = violations.length - comments.length;
-  if (unmapped > 0) {
-    const summary = violations
-      .slice(comments.length, comments.length + 30)
-      .map(
-        (v) =>
-          `- ${v.severity} ${v.rule?.name ?? ''}: ${toRel(v.from?.source || v.from)} -> ${toRel(
-            v.to?.source || v.to
-          )}`
-      )
-      .join('\n');
-    await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
+  } else {
+    // 差分に無い場合は PR 全体コメントで知らせる
+    const listed = files.slice(0, 50).map((f) => `- ${f.filename}`).join('\n');
+    const issueRes = await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
       method: 'POST',
       body: JSON.stringify({
         body:
-          `dependency-cruiser violations (not in changed files): ${unmapped} item(s)\n\n` + summary,
+          `MoleculesBox.tsx (${TARGET_PATH}) がこのPRの差分に見つかりませんでした。\n` +
+          `差分ファイル候補:\n${listed}`,
       }),
     });
+    if (!issueRes.ok) {
+      console.error('fallback issue comment 失敗:', issueRes.status, await issueRes.text());
+    } else {
+      console.log('差分に対象が無いため、PR全体コメントを投稿しました。');
+    }
   }
 }
 
