@@ -1,26 +1,23 @@
+name: depcruise test
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
 permissions:
   contents: read
-  pull-requests: write   # ← 必須
+  pull-requests: write
 
-steps:
-  - uses: actions/checkout@v4
+jobs:
+  depcruise-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-  - uses: pnpm/action-setup@v4
-    with:
-      version: 9
-      run_install: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-  - uses: actions/setup-node@v4
-    with:
-      node-version: '20'
-      cache: 'pnpm'
-
-  - run: pnpm install --frozen-lockfile || pnpm install
-
-  # depcruise 実行はスキップして良い（検証なので不要）
-  # - run: pnpm run depcruise || true
-
-  - name: Post fixed test comment
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    run: node ./scripts/depcruise-annotate.cjs
+      - name: Run fixed comment script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node ./scripts/depcruise-annotate.cjs
