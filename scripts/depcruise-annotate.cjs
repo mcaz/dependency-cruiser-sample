@@ -1,110 +1,135 @@
 // scripts/depcruise-annotate.cjs
-// 依存ゼロ。PRの最初の変更ファイルの 1 行目に固定コメントを付けるだけ。
-// これで「Files changed」に出れば、パス解決やJSONパースが原因ではなかった、と切り分けできます。
-
 const fs = require('fs');
+const path = require('path');
+
+async function gh(pathname, init = {}) {
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
+  const h = init.headers || {};
+  return fetch(`https://api.github.com${pathname}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...h,
+    },
+  });
+}
+
+const toRel = (p) => String(p || '').replace(/^(\.\/|\/)/, '');
 
 async function main() {
-  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
-  if (!token) {
-    console.error('GITHUB_TOKEN が見つかりません（permissions: pull-requests: write が必要）');
-    process.exit(0); // 失敗させず終了
-  }
-
-  const repoFull = process.env.GITHUB_REPOSITORY; // "owner/repo"
-  if (!repoFull) {
-    console.error('GITHUB_REPOSITORY が見つかりません');
-    process.exit(0);
-  }
+  const repoFull = process.env.GITHUB_REPOSITORY;
   const [owner, repo] = repoFull.split('/');
+  const ev = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+  const pull_number = ev.pull_request?.number;
+  const ROOT_PREFIX = process.env.ROOT_PREFIX || ''; // 例: apps/supporter-web/
 
-  // PR番号をイベントペイロードから取得
-  const eventPath = process.env.GITHUB_EVENT_PATH;
-  if (!eventPath || !fs.existsSync(eventPath)) {
-    console.error('GITHUB_EVENT_PATH が見つかりません');
-    process.exit(0);
-  }
-  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
-  const pull_number = event.pull_request?.number;
-  if (!pull_number) {
-    console.error('pull_request.number が見つかりません（PR以外のイベント？）');
-    process.exit(0);
-  }
-
-  // 変更ファイルを 1 件だけ取得（Files changed に必ずあるパスを使う）
-  const filesRes = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}/files?per_page=1`,
-    { headers: { Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28' } }
-  );
-  if (!filesRes.ok) {
-    console.error('listFiles 取得に失敗しました', filesRes.status, await filesRes.text());
-    process.exit(0);
-  }
+  // 変更ファイル一覧
+  const filesRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/files?per_page=300`);
   const files = await filesRes.json();
-  if (!files.length) {
-    console.log('変更ファイルがありません。PRレビューコメントは作成しません。');
-    process.exit(0);
+  const changed = new Set();
+  for (const f of files) {
+    if (f.filename) changed.add(f.filename);
+    if (f.previous_filename) changed.add(f.previous_filename);
   }
 
-  const targetPath = files[0].filename; // PRの1つ目の変更ファイル
-  // 固定コメント本文（テスト用）
-  const body = [
-    '**[TEST] dependency-cruiser warning (fixed message)**',
-    'このコメントは depcruise.json を読まずに、スクリプトが固定文言で投稿しています。',
-    '→ Files changed に表示されれば、API・権限・パス解決の配線はOKです。',
-  ].join('\n');
-
-  // PRレビュー（コメント）を作成：差分行の 1 行目に固定で置く
-  const reviewRes = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/pulls/${pull_number}/reviews`,
-    {
+  // ① 固定コメント（検証用・一度だけ）
+  if (files[0]?.filename) {
+    await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
       method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
       body: JSON.stringify({
         event: 'COMMENT',
         comments: [
           {
-            path: targetPath,
+            path: files[0].filename,
             side: 'RIGHT',
             line: 1,
-            body,
+            body:
+              '**[TEST] dependency-cruiser warning (fixed message)**\n' +
+              'このコメントは固定文言です。次に depcruise.json 由来の本番コメントを試投します。',
           },
         ],
       }),
-    }
-  );
-
-  if (!reviewRes.ok) {
-    console.error('createReview 失敗', reviewRes.status, await reviewRes.text());
-    // フォールバック：PR全体コメント
-    const issueRes = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/issues/${pull_number}/comments`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'X-GitHub-Api-Version': '2022-11-28',
-        },
-        body: JSON.stringify({
-          body: `${body}\n\n（差分行に付けられなかったため、PR全体コメントとして投稿）`,
-        }),
-      }
-    );
-    if (!issueRes.ok) {
-      console.error('fallback issue comment も失敗', issueRes.status, await issueRes.text());
-    }
-    process.exit(0);
+    });
   }
 
-  console.log('OK: Files changed への固定コメントを投稿しました。', targetPath);
+  // ② depcruise.json から本番コメント
+  const reportPath = path.join(process.cwd(), 'depcruise.json');
+  if (!fs.existsSync(reportPath)) {
+    console.log('no depcruise.json – skip real annotations');
+    return;
+  }
+  const data = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+  const violations = (data.violations || data.summary?.violations || []).filter((v) =>
+    ['error', 'warn', 'warning'].includes(String(v.severity).toLowerCase())
+  );
+
+  const comments = [];
+  for (const v of violations) {
+    // from / to の候補を両方見る
+    const cands = [v.from?.resolved, v.from?.source, v.from, v.to?.resolved, v.to?.source, v.to]
+      .map(toRel)
+      .filter(Boolean);
+
+    let target = null;
+    for (const c of cands) {
+      const withPrefix = path.posix.join(ROOT_PREFIX, c); // apps/supporter-web/src/... に合わせる
+      if (changed.has(withPrefix)) {
+        target = withPrefix;
+        break;
+      }
+      if (changed.has(c)) {
+        target = c;
+        break;
+      }
+    }
+    if (!target) continue; // 差分外 → 後で全体コメント
+
+    const body = [
+      `dependency-cruiser violation (${v.severity})`,
+      v.rule?.name ? `rule: \`${v.rule.name}\`` : null,
+      v.comment ? `comment: ${v.comment}` : null,
+      v.from && v.to
+        ? `from: \`${toRel(v.from?.source || v.from)}\` -> to: \`${toRel(v.to?.source || v.to)}\``
+        : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    comments.push({ path: target, side: 'RIGHT', line: 1, body });
+    if (comments.length >= 50) break; // スパム防止
+  }
+
+  if (comments.length) {
+    await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify({ event: 'COMMENT', comments }),
+    });
+  }
+
+  // ③ 差分に紐づけられなかった違反があるなら、PR全体コメントで要約（ゼロ表示防止）
+  const unmapped = violations.length - comments.length;
+  if (unmapped > 0) {
+    const summary = violations
+      .slice(comments.length, comments.length + 30)
+      .map(
+        (v) =>
+          `- ${v.severity} ${v.rule?.name ?? ''}: ${toRel(v.from?.source || v.from)} -> ${toRel(
+            v.to?.source || v.to
+          )}`
+      )
+      .join('\n');
+    await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({
+        body:
+          `dependency-cruiser violations (not in changed files): ${unmapped} item(s)\n\n` + summary,
+      }),
+    });
+  }
 }
 
 main().catch((e) => {
   console.error(e);
-  process.exit(0);
 });
