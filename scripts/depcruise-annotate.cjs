@@ -1,17 +1,12 @@
 // scripts/depcruise-annotate.cjs
-// 目的: このPRの "src/components/Molecules/MoleculesBox/MoleculesBox.tsx" に
-//       固定文言のレビューコメントを 1 件だけ投稿する（Files changed に出ることを確認）
-// 依存: なし（Node の fetch を使用）。ワークフロー側で pull-requests: write 権限が必要。
+// 目的: PR内の src/components/Molecules/MoleculesBox/MoleculesBox.tsx の
+//      「差分上の実在する追加行」に固定メッセージのレビューコメントを投稿する。
 
 const fs = require('fs');
 
 async function gh(pathname, init = {}) {
-  const token =
-    process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
-  if (!token) {
-    console.error('GITHUB_TOKEN が見つかりません（permissions: pull-requests: write が必要）');
-    return { ok: false, status: 0, text: async () => 'no token' };
-  }
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.INPUT_GITHUB_TOKEN;
+  if (!token) throw new Error('GITHUB_TOKEN がありません（pull-requests: write が必要）');
   const headers = {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
@@ -21,71 +16,71 @@ async function gh(pathname, init = {}) {
   return fetch(`https://api.github.com${pathname}`, { ...init, headers });
 }
 
-async function main() {
-  // リポジトリとPR番号
-  const repoFull = process.env.GITHUB_REPOSITORY; // e.g. "owner/repo"
-  if (!repoFull) {
-    console.error('GITHUB_REPOSITORY が見つかりません');
-    return;
+function findFirstAddedLineInNewFile(patch) {
+  // unified diff を読み、最初の hunk の + 側の行番号を返す
+  // 例: @@ -12,4 +20,7 @@  の +20 が新ファイル側の開始行
+  if (!patch) return null;
+  const lines = patch.split('\n');
+
+  let newLineBase = null; // hunk開始時の新ファイル側開始行
+  let newLine = null;
+
+  for (const line of lines) {
+    if (line.startsWith('@@')) {
+      // hunk ヘッダをパース: @@ -a,b +c,d @@
+      const m = line.match(/@@\s+-(\d+)(?:,\d+)?\s+\+(\d+)(?:,\d+)?\s+@@/);
+      if (m) {
+        newLineBase = parseInt(m[2], 10);
+      } else {
+        newLineBase = null;
+      }
+      continue;
+    }
+    if (newLineBase == null) continue; // hunk外はスキップ
+
+    // 文脈/追加/削除の各行で新ファイル側の行番号を進める
+    if (line.startsWith('+')) {
+      // 最初の追加行を見つけたら、その時点の newLine を返す
+      newLine = newLine ?? newLineBase;
+      return newLine;
+    } else if (line.startsWith('-')) {
+      // 旧ファイル側のみ。新ファイルの行は進めない
+      // noop
+    } else {
+      // ' ' (コンテキスト) は新ファイル側の行も進む
+      newLineBase += 1;
+    }
+    // 追加行でなければ、追加行が現れたときに newLineBase を使うのでここは何もしない
   }
+  return null;
+}
+
+async function main() {
+  const repoFull = process.env.GITHUB_REPOSITORY; // owner/repo
+  if (!repoFull) throw new Error('GITHUB_REPOSITORY がありません');
   const [owner, repo] = repoFull.split('/');
 
-  const eventPath = process.env.GITHUB_EVENT_PATH;
-  if (!eventPath || !fs.existsSync(eventPath)) {
-    console.error('GITHUB_EVENT_PATH が見つかりません');
-    return;
-  }
-  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
-  const pull_number = event.pull_request?.number;
-  if (!pull_number) {
-    console.error('pull_request.number が見つかりません（PR以外のイベント）');
-    return;
-  }
+  const ev = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
+  const pull_number = ev.pull_request?.number;
+  if (!pull_number) throw new Error('pull_request.number がありません');
+  const headSHA = ev.pull_request?.head?.sha;
+  if (!headSHA) throw new Error('pull_request.head.sha がありません');
 
-  // 差分ファイル一覧を取得
+  // 差分ファイル一覧
   const filesRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/files?per_page=300`);
-  if (!filesRes.ok) {
-    console.error('listFiles 取得に失敗:', filesRes.status, await filesRes.text());
-    return;
-  }
+  if (!filesRes.ok) throw new Error(`listFiles 失敗: ${filesRes.status} ${await filesRes.text()}`);
   const files = await filesRes.json();
 
-  // 目標ファイル（固定）
+  // 目標ファイル
   const TARGET_PATH = 'src/components/Molecules/MoleculesBox/MoleculesBox.tsx';
-
-  // 差分に存在するか確認（リネーム対応で previous_filename も見る）
-  const targetInDiff = files.find(
+  const target = files.find(
     (f) => f.filename === TARGET_PATH || f.previous_filename === TARGET_PATH
   );
 
-  if (targetInDiff) {
-    // Files changed の MoleculesBox.tsx（現パス）に 1 行目で固定コメント
-    const reviewRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/reviews`, {
-      method: 'POST',
-      body: JSON.stringify({
-        event: 'COMMENT',
-        comments: [
-          {
-            path: targetInDiff.filename, // 現在の差分上のパスに合わせる
-            side: 'RIGHT',
-            line: 1, // まずは 1 行目固定（行番号解決は後で拡張可能）
-            body:
-              '**[TEST] dependency-cruiser warning (fixed message)**\n' +
-              'MoleculesBox.tsx に対する決め打ち警告（動作検証用）。',
-          },
-        ],
-      }),
-    });
-
-    if (!reviewRes.ok) {
-      console.error('createReview 失敗:', reviewRes.status, await reviewRes.text());
-    } else {
-      console.log('OK: Files changed の MoleculesBox.tsx に固定コメントを投稿しました。');
-    }
-  } else {
-    // 差分に無い場合は PR 全体コメントで知らせる
+  if (!target) {
+    // 差分に見つからない場合はPR全体コメントで通知
     const listed = files.slice(0, 50).map((f) => `- ${f.filename}`).join('\n');
-    const issueRes = await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
+    await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
       method: 'POST',
       body: JSON.stringify({
         body:
@@ -93,14 +88,58 @@ async function main() {
           `差分ファイル候補:\n${listed}`,
       }),
     });
-    if (!issueRes.ok) {
-      console.error('fallback issue comment 失敗:', issueRes.status, await issueRes.text());
-    } else {
-      console.log('差分に対象が無いため、PR全体コメントを投稿しました。');
-    }
+    return;
+  }
+
+  // diff hunk から「新ファイル側の最初の追加行」を取得
+  const firstAddedLine = findFirstAddedLineInNewFile(target.patch);
+  if (!firstAddedLine) {
+    // 追加行が無い（リネームのみ/コンテキストのみ）場合は、PR全体コメントにフォールバック
+    await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({
+        body:
+          `MoleculesBox.tsx の差分に追加行が見つからず、差分行コメントを付けられませんでした。` +
+          `（renameやコンテキストのみの可能性）`,
+      }),
+    });
+    return;
+  }
+
+  // 単発API: Create a review comment for a pull request
+  // 必須: commit_id(head), path, side: 'RIGHT', line: 差分で追加された「新ファイル側の実在行」
+  const createRes = await gh(`/repos/${owner}/${repo}/pulls/${pull_number}/comments`, {
+    method: 'POST',
+    body: JSON.stringify({
+      commit_id: headSHA,
+      path: target.filename, // 現在の差分上のパス
+      side: 'RIGHT',
+      line: firstAddedLine,
+      body:
+        '**[TEST] dependency-cruiser warning (fixed message)**\n' +
+        `差分の最初の追加行(${firstAddedLine})に固定コメントを投稿しました。`,
+    }),
+  });
+
+  if (!createRes.ok) {
+    console.error('createReviewComment 失敗:', createRes.status, await createRes.text());
+    // フォールバック：PR全体コメント
+    await gh(`/repos/${owner}/${repo}/issues/${pull_number}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({
+        body:
+          `差分行コメントに失敗したため、PR全体コメントにフォールバックしました。\n` +
+          `target: ${target.filename}, firstAddedLine: ${firstAddedLine}`,
+      }),
+    });
+  } else {
+    console.log(
+      `OK: ${target.filename} の差分 追加行 ${firstAddedLine} にインラインコメントを投稿しました。`
+    );
   }
 }
 
 main().catch((e) => {
   console.error(e);
+  process.exit(0);
 });
